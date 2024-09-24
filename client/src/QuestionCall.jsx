@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import { CheckboxDemo } from "./utils/CheckBox.jsx";
 
 function QuestionCall() {
   const [questions, setQuestions] = useState([]);
+  const [checkedQuestions, setCheckedQuestions] = useState({}); // Track checked state
 
-  // Fetch data from backend when the component loads
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -11,7 +12,7 @@ function QuestionCall() {
           method: "GET",
         });
         const data = await response.json();
-        setQuestions(data); // Store the array of questions
+        setQuestions(data);
       } catch (error) {
         console.error("Error fetching questions:", error);
         alert("Error fetching questions.");
@@ -23,25 +24,22 @@ function QuestionCall() {
 
   const handleRevisionChange = async (id) => {
     try {
-      // Fetch the current question to get its existing nextrevision
       const currentQuestion = questions.find((ques) => ques._id === id);
       let newRevisionDate;
 
       if (currentQuestion) {
-        // Example spaced revision logic: Double the revision interval
         const currentRevisionDate = new Date(currentQuestion.nextrevision);
         newRevisionDate = new Date(currentRevisionDate);
-        newRevisionDate.setDate(newRevisionDate.getDate() + 2); // Change this logic as needed
+        newRevisionDate.setDate(newRevisionDate.getDate() + 2);
       } else {
-        // Fallback in case the question isn't found
         newRevisionDate = new Date();
-        newRevisionDate.setDate(newRevisionDate.getDate() + 1); // Default to 1 day if not found
+        newRevisionDate.setDate(newRevisionDate.getDate() + 1);
       }
 
       const response = await fetch(
         `http://localhost:5040/update-revision/${id}`,
         {
-          method: "PATCH", // Use PATCH for updating a resource
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
           },
@@ -50,7 +48,6 @@ function QuestionCall() {
       );
 
       if (response.ok) {
-        // Update the state to reflect the changes
         setQuestions((prevQuestions) =>
           prevQuestions.map((ques) =>
             ques._id === id ? { ...ques, nextrevision: newRevisionDate } : ques
@@ -66,23 +63,44 @@ function QuestionCall() {
     }
   };
 
+  const handleCheckboxChange = (id) => {
+    setCheckedQuestions((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+    handleRevisionChange(id);
+  };
+
   return (
-    <div>
-      <h1>Today Revision Questions</h1>
+    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold text-center mb-4">
+        Today's Revision Questions
+      </h1>
       {questions.length === 0 ? (
-        <p>No questions available for today.</p>
+        <p className="text-center text-gray-500">
+          No questions available for today.
+        </p>
       ) : (
-        <ul>
+        <ul className="space-y-4">
           {questions.map((ques) => (
-            <li key={ques._id}>
-              <a href={ques.link} target="_blank" rel="noopener noreferrer">
-                {ques.title}
-              </a>
-              <input
-                type="checkbox"
-                onChange={() => handleRevisionChange(ques._id)}
-                style={{ marginLeft: "10px" }}
-              />
+            <li
+              key={ques._id}
+              className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-100"
+            >
+              <div className="flex items-center gap-10">
+                <CheckboxDemo
+                  checked={!!checkedQuestions[ques._id]} // Check if the question is marked
+                  onCheckedChange={() => handleCheckboxChange(ques._id)} // Handle checkbox change
+                />
+                <a
+                  href={ques.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline"
+                >
+                  {ques.title}
+                </a>
+              </div>
             </li>
           ))}
         </ul>

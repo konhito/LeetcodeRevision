@@ -21,6 +21,7 @@ function Addques() {
       const data = await response.json();
       if (response.ok) {
         alert(data.msg);
+        setLink(""); // Clear input after successful submission
       } else {
         alert(data.msg);
       }
@@ -31,14 +32,21 @@ function Addques() {
   };
 
   return (
-    <>
+    <div className="flex items-center justify-center p-6 rounded-lg  ">
       <input
-        placeholder="enter the link"
+        type="text"
+        placeholder="Enter the link"
         value={link}
         onChange={(e) => setLink(e.target.value)}
+        className="border border-gray-300 rounded-l-md p-2 w-2/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
-      <button onClick={handleSubmit}>Submit</button>
-    </>
+      <button
+        onClick={handleSubmit}
+        className="bg-blue-600 text-white rounded-r-md px-4 py-2 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        Submit
+      </button>
+    </div>
   );
 }
 
