@@ -10,7 +10,7 @@ function Addques() {
     }
 
     try {
-      const response = await fetch("http://localhost:5040/", {
+      const response = await fetch("https://leet-server-od2t.vercel.app/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

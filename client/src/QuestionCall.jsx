@@ -8,9 +8,15 @@ function QuestionCall() {
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await fetch("http://localhost:5040/ques", {
-          method: "GET",
-        });
+        const response = await fetch(
+          "https://leet-server-od2t.vercel.app/ques",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         const data = await response.json();
         setQuestions(data);
       } catch (error) {
@@ -37,7 +43,7 @@ function QuestionCall() {
       }
 
       const response = await fetch(
-        `http://localhost:5040/update-revision/${id}`,
+        `https://leet-server-od2t.vercel.app/update-revision/${id}`,
         {
           method: "PATCH",
           headers: {
